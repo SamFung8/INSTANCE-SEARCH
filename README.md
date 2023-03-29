@@ -1,1 +1,3 @@
-# INSTANCE-SEARCH-
+# INSTANCE-SEARCH- ASSIGNMENTT 1 CS4186 VISION AND IMAGE 
+
+You are given a collection of 5,000 images and 20 testing query instances (you can download from this link: onedrive link). Each image contains one instance (object). Your task is to implement two methods for instance search. Specifically, given a query instance with the instance bounding box location in the query instance image (stored in the query_txt directory with the same name of query instance image), a method needs to find the images that contain the same query instance from the image collection （5000 images） and then ranks them according to similarity or confidence. The 20 testing query images are used for evaluating the performance of your implementation.  
