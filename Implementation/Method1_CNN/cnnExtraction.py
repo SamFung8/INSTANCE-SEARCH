@@ -32,7 +32,7 @@ def img_preprocess(img_path, crop_txt_path, crop_img_save_path, query_process):
         img = cv2.imread(img_path)
         img = img[:,:,::-1] #bgr2rgb
         img_resize = cv2.resize(img, (299, 299), interpolation=cv2.INTER_CUBIC) # resize the image
-        return img
+        return img_resize
 
 def extract_avg_layer(croped_img, img, featsave_path, img_name, query_process):
     save_path = os.path.join(featsave_path, img_name + "_uncropImg.npy")
@@ -93,7 +93,6 @@ def main():
         img = img_preprocess(os.path.join(gallery_path, img_file), "", "", False)
         extract_avg_layer("", img, avg_feature_save_path, img_name, False)
         extract_max_layer("", img, max_feature_save_path, img_name, False)
-
 
 if __name__=='__main__':
     main()

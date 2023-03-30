@@ -17,10 +17,6 @@ def output(result, count):
     f.close()
 
 
-query_file = '2040'
-
-# Measure the similarity scores between query feature and gallery features.
-# You could also use other metrics to measure the similarity scores between features.
 def similarity(query_feat, gallery_feat):
     #print(query_feat.shape)
     if len(query_feat.shape) == 3:
@@ -39,17 +35,13 @@ def similarity(query_feat, gallery_feat):
 def retrival_idx(gallery_dir):
     query_cropped_feat_max = np.load('./feature/query_img/max_layer/' + query_file + '_cropedImg.npy')
     query_cropped_feat_avg = np.load('./feature/query_img/avg_layer/' + query_file + '_cropedImg.npy')
-    query_feat_max = np.load('./feature/query_img/max_layer/' + query_file + '_uncropedImg.npy')
-    query_feat_avg = np.load('./feature/query_img/max_layer/' + query_file + '_uncropedImg.npy')
+    query_feat_max = np.load('./feature/query_img/max_layer/' + query_file + '_uncropImg.npy')
+    query_feat_avg = np.load('./feature/query_img/avg_layer/' + query_file + '_uncropImg.npy')
     dict = {}
     for gallery_file in os.listdir(gallery_dir):
-        #gallery_cropped_feat_max = np.load(os.path.join('./feature/gallery_img/max_layer', gallery_file))
-        #gallery_cropped_feat_avg = np.load(os.path.join('./own_data/pooling_feature_withCrop/avg_pooling/gallery_feature_avg_pooling', gallery_file))
-        gallery_feat_max = np.load(os.path.join('./feature/gallery_img/max_layer', gallery_file))
-        gallery_feat_avg = np.load(os.path.join('./feature/gallery_img/avg_layer', gallery_file))
-        gallery_idx = gallery_file.split('.')[0] + '.jpg'
-        #sim = similarity(query_feat, gallery_feat)
-        #sim_soft = similarity(query_feat_soft, gallery_feat_soft)
+        gallery_feat_max = np.load(os.path.join('./feature/gallery_img/max_layer/', gallery_file))
+        gallery_feat_avg = np.load(os.path.join('./feature/gallery_img/avg_layer/', gallery_file))
+        gallery_idx = gallery_file.split('_')[0] + '.jpg'
         sim_max_cropped = similarity(query_cropped_feat_max, gallery_feat_max)
         sim_avg_cropped = similarity(query_cropped_feat_avg, gallery_feat_avg)
         sim_max = similarity(query_feat_max, gallery_feat_max)
@@ -59,7 +51,6 @@ def retrival_idx(gallery_dir):
     #print(dict)
     sorted_dict = sorted(dict.items(), key=lambda item: item[1]) # Sort the similarity score
     best_five = sorted_dict[-9:] # Get the best five retrived images
-    #return best_five
     return sorted_dict
 
 def visulization(retrived, query):
@@ -70,6 +61,7 @@ def visulization(retrived, query):
     plt.imshow(img_rgb_rgb)
     for i in range(9):
         img_path = '../../Image Data/Dataset Image/gallery_4186/' + retrived[i][0]
+        print(img_path)
         img = cv2.imread(img_path)
         img_rgb = img[:,:,::-1]
         plt.subplot(4, 3, i+1)
@@ -79,7 +71,7 @@ def visulization(retrived, query):
 
 if __name__ == '__main__':
     query_list = []
-    query_path = '../../Image Data/Testing Image/query_4186'
+    query_path = '../../Image Data/Testing Image/query_4186/'
     count = 1
 
     for img_file in tqdm(os.listdir(query_path)):
@@ -90,18 +82,18 @@ if __name__ == '__main__':
     
     for img in query_list:
         query_file = str(img)
-        gallery_dir = './own_data/pooling_feature/gallery_feature/'
+        gallery_dir = './feature/gallery_img/max_layer/'
         
         result = retrival_idx(gallery_dir)
         result.reverse()
     
-        #output(result, count)
+        output(result, count)
         count = count + 1
         
         #best_five = retrival_idx(gallery_dir) # retrieve top 5 matching images in the gallery.
         #print(best_five)
         #best_five.reverse()
         #cv2.imread("./data/gallery/" + str(18841.jpg))
-        query_path = './own_data/query_4186/' + query_file + '.jpg'
-        visulization(best_five, query_path) # Visualize the retrieval results
+        #query_path = '../../Image Data/Testing Image/query_4186/' + query_file + '.jpg'
+        #visulization(result, query_path) # Visualize the retrieval results
 
