@@ -5,34 +5,34 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.spatial.distance import euclidean
 
-def similarity(query_feat, gallery_feat, query_feat2, gallery_feat2):
-    h_sim = euclidean(query_feat2[0], gallery_feat2[0])
-    s_sim = euclidean(query_feat2[1], gallery_feat2[1])
-    v_sim = euclidean(query_feat2[2], gallery_feat2[2])
-    sim2 = h_sim + s_sim + v_sim
+def similarity(query_feat_hsv, gallery_feat_hsv, query_feat_rgb, gallery_feat_rgb):
+    r_sim = euclidean(query_feat_rgb[0], gallery_feat_rgb[0])
+    g_sim = euclidean(query_feat_rgb[1], gallery_feat_rgb[1])
+    b_sim = euclidean(query_feat_rgb[2], gallery_feat_rgb[2])
+    sim_rgb = r_sim + g_sim + b_sim
 
-    h_sim = euclidean(query_feat[0], gallery_feat[0])
-    s_sim = euclidean(query_feat[1], gallery_feat[1])
-    v_sim = euclidean(query_feat[2], gallery_feat[2])
-    sim = h_sim + s_sim + v_sim
+    h_sim = euclidean(query_feat_hsv[0], gallery_feat_hsv[0])
+    s_sim = euclidean(query_feat_hsv[1], gallery_feat_hsv[1])
+    v_sim = euclidean(query_feat_hsv[2], gallery_feat_hsv[2])
+    sim_hsv = h_sim + s_sim + v_sim
 
-    sim = (sim + sim2) /2
+    sim = (sim_hsv + sim_rgb) /2
 
     sim = np.squeeze(sim)
     return sim
 
 
-def retrival_idx(gallery_dir, query_dir, query_file):
-    query_feat = np.load(os.path.join(query_dir + query_file) + '.npy', allow_pickle=True)
-    query_feat2 = np.load(os.path.join('./feature/query/RGB_color/' + query_file) + '.npy', allow_pickle=True)
+def retrival_idx(gallery_dir_hsv, query_dir_hsv, query_file, gallery_dir_rgb, query_dir_rgb):
+    query_feat_hsv = np.load(os.path.join(query_dir_hsv + query_file) + '.npy', allow_pickle=True)
+    query_feat_rgb = np.load(os.path.join(query_dir_rgb + query_file) + '.npy', allow_pickle=True)
     # print(os.path.join(query_dir + query_file) + '.npy')
     dict = {}
-    for gallery_file in tqdm(os.listdir(gallery_dir)):
-        gallery_feat = np.load(os.path.join(gallery_dir, gallery_file), allow_pickle=True)
-        gallery_feat2 = np.load(os.path.join('./feature/gallery/RGB_color/', gallery_file), allow_pickle=True)
+    for gallery_file in tqdm(os.listdir(gallery_dir_hsv)):
+        gallery_feat_hsv = np.load(os.path.join(gallery_dir_hsv, gallery_file), allow_pickle=True)
+        gallery_feat_rgb = np.load(os.path.join(gallery_dir_rgb, gallery_file), allow_pickle=True)
         # print(os.path.join(gallery_dir, gallery_file))
         gallery_idx = gallery_file.split('.')[0] + '.jpg'
-        sim = similarity(query_feat, gallery_feat, query_feat2, gallery_feat2)
+        sim = similarity(query_feat_hsv, gallery_feat_hsv, query_feat_rgb, gallery_feat_rgb)
         res = sim
         dict[gallery_idx] = res
     sorted_dict = sorted(dict.items(), key=lambda item: item[1])  # Sort the similarity score
@@ -56,9 +56,20 @@ def visulization(retrived, query):
     plt.show()
 
 
-def getRank(query_path, gallery_dir):
+def output(result, count):
+    print('Outputting rank list of Q' + str(count))
+    f = open(r'./rank_list.txt', 'a')
+    f.write('Q'+str(count)+': ')
+    for j in result:
+        f.write(str(j[0].split('.')[0])+' ')
+    f.write('\n')
+    f.close()
+
+
+def getRank(query_path_hsv, gallery_dir_hsv, query_path_rgb, gallery_dir_rgb):
     query_list = []
-    for img_file in tqdm(os.listdir(query_path)):
+    count = 1
+    for img_file in tqdm(os.listdir(query_path_hsv)):
         query_list.append(int(img_file.split('.')[0]))
 
     query_list.sort()
@@ -66,14 +77,22 @@ def getRank(query_path, gallery_dir):
 
     for img in query_list:
         query_file = str(img)
-        result = retrival_idx(gallery_dir, query_path, query_file)
+
+        result = retrival_idx(gallery_dir_hsv, query_path_hsv, query_file, gallery_dir_rgb, query_path_rgb)
         # result.reverse()
-        visulization(result[0:9], os.path.join('../../Image Data/Testing Image/query_4186/', query_file) + '.jpg')
+
+        output(result, count)
+        count = count + 1
+
+        visulization(result, os.path.join('../../Image Data/Testing Image/query_4186/', query_file) + '.jpg')
 
 
 
-query_save_path = './feature/query/HSV_color/'
-gallery_save_path = './feature/gallery/HSV_color/'
+query_save_path_hsv = './feature/query/HSV_color/'
+gallery_save_path_hsv = './feature/gallery/HSV_color/'
+
+query_save_path_rgb = './feature/query/RGB_color/'
+gallery_save_path_rgb = './feature/gallery/RGB_color/'
 
 
-getRank(query_save_path, gallery_save_path)
+getRank(query_save_path_hsv, gallery_save_path_hsv, query_save_path_rgb, gallery_save_path_rgb)
