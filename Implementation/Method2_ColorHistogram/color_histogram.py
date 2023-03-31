@@ -16,10 +16,10 @@ def color_his(query_path, save_path):
         img = cv2.imread(query_path + query_file + '.jpg')
 
         # Convert BGR to HSV format
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # Create empty lists for histogram values
-        h_hist = [0] * 180
+        h_hist = [0] * 256
         s_hist = [0] * 256
         v_hist = [0] * 256
 
@@ -43,10 +43,10 @@ def color_his(query_path, save_path):
     
 
 query_path = '../../Image Data/Testing Image/query_croped_4186/'
-query_save_path = './feature/query/HSV_color/'
+query_save_path = './feature/query/RGB_color/'
 
 gallery_path = '../../Image Data/Dataset Image/gallery_croped_4186/'
-gallery_save_path = './feature/gallery/HSV_color/'
+gallery_save_path = './feature/gallery/RGB_color/'
 
 color_his(query_path, query_save_path)
 color_his(gallery_path, gallery_save_path)

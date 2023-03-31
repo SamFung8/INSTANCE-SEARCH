@@ -3,34 +3,36 @@ from tqdm import tqdm
 import os
 import numpy as np
 from matplotlib import pyplot as plt
+from scipy.spatial.distance import euclidean
 
-def similarity(query_feat, gallery_feat):
-    query_feat = cv2.resize(query_feat, (224, 224), interpolation=cv2.INTER_CUBIC)
-    gallery_feat = cv2.resize(gallery_feat, (224, 224), interpolation=cv2.INTER_CUBIC)
-    # query_feat = cv2.cvtColor(query_feat, cv2.COLOR_BGR2GRAY)
-    # gallery_feat = cv2.cvtColor(gallery_feat, cv2.COLOR_BGR2GRAY)
-    query_feat = cv2.calcHist([query_feat], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
-    # cv2.normalize(query_feat, query_feat, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-    gallery_feat = cv2.calcHist([gallery_feat], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
-    # cv2.normalize(gallery_feat, gallery_feat, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+def similarity(query_feat, gallery_feat, query_feat2, gallery_feat2):
+    h_sim = euclidean(query_feat2[0], gallery_feat2[0])
+    s_sim = euclidean(query_feat2[1], gallery_feat2[1])
+    v_sim = euclidean(query_feat2[2], gallery_feat2[2])
+    sim2 = h_sim + s_sim + v_sim
 
-    # query_feat = query_feat.reshape(1,query_feat.shape[0] * query_feat.shape[1])
-    # gallery_feat = gallery_feat.reshape(1,gallery_feat.shape[0] * gallery_feat.shape[1])
-    sim = cv2.compareHist(query_feat, gallery_feat, cv2.HISTCMP_BHATTACHARYYA)
-    # print(sim)
+    h_sim = euclidean(query_feat[0], gallery_feat[0])
+    s_sim = euclidean(query_feat[1], gallery_feat[1])
+    v_sim = euclidean(query_feat[2], gallery_feat[2])
+    sim = h_sim + s_sim + v_sim
+
+    sim = (sim + sim2) /2
+
     sim = np.squeeze(sim)
     return sim
 
 
 def retrival_idx(gallery_dir, query_dir, query_file):
-    query_feat = cv2.imread(os.path.join(query_dir + query_file) + '.jpg')
+    query_feat = np.load(os.path.join(query_dir + query_file) + '.npy', allow_pickle=True)
+    query_feat2 = np.load(os.path.join('./feature/query/RGB_color/' + query_file) + '.npy', allow_pickle=True)
     # print(os.path.join(query_dir + query_file) + '.npy')
     dict = {}
     for gallery_file in tqdm(os.listdir(gallery_dir)):
-        gallery_feat = cv2.imread(os.path.join(gallery_dir, gallery_file))
+        gallery_feat = np.load(os.path.join(gallery_dir, gallery_file), allow_pickle=True)
+        gallery_feat2 = np.load(os.path.join('./feature/gallery/RGB_color/', gallery_file), allow_pickle=True)
         # print(os.path.join(gallery_dir, gallery_file))
         gallery_idx = gallery_file.split('.')[0] + '.jpg'
-        sim = similarity(query_feat, gallery_feat)
+        sim = similarity(query_feat, gallery_feat, query_feat2, gallery_feat2)
         res = sim
         dict[gallery_idx] = res
     sorted_dict = sorted(dict.items(), key=lambda item: item[1])  # Sort the similarity score
@@ -45,7 +47,7 @@ def visulization(retrived, query):
     img_rgb_rgb = query_img[:, :, ::-1]
     plt.imshow(img_rgb_rgb)
     for i in range(9):
-        img_path = '../../Image Data/Dataset Image/gallery_croped_4186/' + retrived[i][0]
+        img_path = '../../Image Data/Dataset Image/gallery_4186/' + retrived[i][0]
         img = cv2.imread(img_path)
         img_rgb = img[:, :, ::-1]
         plt.subplot(4, 3, i + 1)
@@ -66,14 +68,12 @@ def getRank(query_path, gallery_dir):
         query_file = str(img)
         result = retrival_idx(gallery_dir, query_path, query_file)
         # result.reverse()
-        visulization(result[0:9], os.path.join('../../Image Data/Testing Image/query_croped_4186/', query_file) + '.jpg')
+        visulization(result[0:9], os.path.join('../../Image Data/Testing Image/query_4186/', query_file) + '.jpg')
 
 
-query_path = '../../Image Data/Testing Image/query_croped_4186/'
+
 query_save_path = './feature/query/HSV_color/'
-
-gallery_path = '../../Image Data/Dataset Image/gallery_croped_4186/'
 gallery_save_path = './feature/gallery/HSV_color/'
 
 
-getRank(query_path, gallery_path)
+getRank(query_save_path, gallery_save_path)
