@@ -89,6 +89,6 @@ if __name__ == '__main__':
         #print(best_five)
         #best_five.reverse()
         #cv2.imread("./data/gallery/" + str(18841.jpg))
-        #query_path = '../../Image Data/Testing Image/query_4186/' + query_file + '.jpg'
-        #visulization(result, query_path) # Visualize the retrieval results
+        query_path = '../../Image Data/Testing Image/query_4186/' + query_file + '.jpg'
+        visulization(result, query_path) # Visualize the retrieval results
 
