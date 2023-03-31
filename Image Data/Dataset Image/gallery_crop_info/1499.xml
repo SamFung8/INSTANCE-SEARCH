@@ -1,0 +1,26 @@
+<annotation>
+	<folder>gallery_4186</folder>
+	<filename>1499.jpg</filename>
+	<path>C:\Users\sam\OneDrive - City University of Hong Kong\2022-2023_Sem B\CS4186_Computer Vision and Image Processing\Assignment1\Source\Image Data\Dataset Image\gallery_4186\1499.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1000</width>
+		<height>561</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>objectd</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>345</xmin>
+			<ymin>25</ymin>
+			<xmax>574</xmax>
+			<ymax>430</ymax>
+		</bndbox>
+	</object>
+</annotation>
