@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 
 def output(result, count):
-    print(len(result))
+    print('Outputting rank list of Q' + str(count))
     f = open(r'./rank_list.txt', 'a')
     f.write('Q'+str(count)+': ')
     for j in result:
@@ -35,8 +35,6 @@ def similarity(query_feat, gallery_feat):
 def retrival_idx(gallery_dir):
     query_cropped_feat_max = np.load('./feature/query_img/max_layer/' + query_file + '_cropedImg.npy')
     query_cropped_feat_avg = np.load('./feature/query_img/avg_layer/' + query_file + '_cropedImg.npy')
-    query_feat_max = np.load('./feature/query_img/max_layer/' + query_file + '_uncropImg.npy')
-    query_feat_avg = np.load('./feature/query_img/avg_layer/' + query_file + '_uncropImg.npy')
     dict = {}
     for gallery_file in os.listdir(gallery_dir):
         gallery_feat_max = np.load(os.path.join('./feature/gallery_img/max_layer/', gallery_file))
@@ -44,13 +42,10 @@ def retrival_idx(gallery_dir):
         gallery_idx = gallery_file.split('_')[0] + '.jpg'
         sim_max_cropped = similarity(query_cropped_feat_max, gallery_feat_max)
         sim_avg_cropped = similarity(query_cropped_feat_avg, gallery_feat_avg)
-        sim_max = similarity(query_feat_max, gallery_feat_max)
-        sim_avg = similarity(query_feat_avg, gallery_feat_avg)
-        res = ((sim_avg_cropped + sim_max_cropped)/ 2 + (sim_avg + sim_max)/ 2)/2
+        res = (sim_avg_cropped + sim_max_cropped)/ 2
         dict[gallery_idx] = res
     #print(dict)
     sorted_dict = sorted(dict.items(), key=lambda item: item[1]) # Sort the similarity score
-    best_five = sorted_dict[-9:] # Get the best five retrived images
     return sorted_dict
 
 def visulization(retrived, query):
