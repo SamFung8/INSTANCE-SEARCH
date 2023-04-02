@@ -49,22 +49,23 @@ def retrival_idx(gallery_dir):
     return sorted_dict
 
 def visulization(retrived, query):
-    plt.subplot(4, 3, 1)
+    plt.subplot(4, 4, 1)
     plt.title('query')
     query_img = cv2.imread(query)
     img_rgb_rgb = query_img[:,:,::-1]
     plt.imshow(img_rgb_rgb)
-    for i in range(9):
+    for i in range(10):
         img_path = '../../Image Data/Dataset Image/gallery_4186/' + retrived[i][0]
         print(img_path)
         img = cv2.imread(img_path)
         img_rgb = img[:,:,::-1]
-        plt.subplot(4, 3, i+1)
-        plt.title(retrived[i][1])
+        plt.subplot(4, 4, i+2)
+        plt.title('Value = ' + "%.2f" % retrived[i][1])
         plt.imshow(img_rgb)
     plt.show()
 
 if __name__ == '__main__':
+    os.remove('./rank_list.txt')
     query_list = []
     query_path = '../../Image Data/Testing Image/query_4186/'
     count = 1
