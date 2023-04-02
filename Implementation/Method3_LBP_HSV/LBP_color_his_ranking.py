@@ -34,7 +34,7 @@ def retrival_idx(gallery_dir_hsv, query_dir_hsv, query_file):
 
 
 def visulization(retrived, query):
-    plt.subplot(4, 3, 1)
+    plt.subplot(4, 4, 1)
     plt.title('query')
     query_img = cv2.imread(query)
     img_rgb_rgb = query_img[:, :, ::-1]
@@ -43,8 +43,8 @@ def visulization(retrived, query):
         img_path = '../../Image Data/Dataset Image/gallery_4186/' + retrived[i][0]
         img = cv2.imread(img_path)
         img_rgb = img[:, :, ::-1]
-        plt.subplot(4, 3, i + 1)
-        plt.title(retrived[i][1])
+        plt.subplot(4, 4, i + 2)
+        plt.title('Value = ' + "%.2f" % retrived[i][1])
         plt.imshow(img_rgb)
     plt.show()
 
@@ -84,4 +84,5 @@ def getRank(query_path_hsv, gallery_dir_hsv):
 query_save_path_hsv = './feature/query/HSV_color/'
 gallery_save_path_hsv = './feature/gallery/HSV_color/'
 
+os.remove('./rank_list.txt')
 getRank(query_save_path_hsv, gallery_save_path_hsv)
